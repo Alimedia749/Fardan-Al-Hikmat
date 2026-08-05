@@ -68,37 +68,19 @@ $product_img = get_template_directory_uri() . '/assets/images/product-ashwagandh
 				</a>
 			</div>
 
-			<!-- Stats -->
-			<div class="hero__stats" aria-label="<?php esc_attr_e( 'Key statistics', 'fardan-hikmat' ); ?>">
+			<!-- Authentic Product Badges -->
+			<div class="hero__stats" aria-label="<?php esc_attr_e( 'Key features', 'fardan-hikmat' ); ?>">
 				<div class="hero__stat">
-					<span
-						class="hero__stat-number"
-						data-counter="500"
-						data-counter-suffix="+"
-						data-counter-duration="1800"
-						aria-label="<?php esc_attr_e( '500+ herbal products', 'fardan-hikmat' ); ?>"
-					>500+</span>
-					<span class="hero__stat-label"><?php esc_html_e( 'Herbal Products', 'fardan-hikmat' ); ?></span>
+					<span class="hero__stat-number" style="font-size:1.5rem;">🌿</span>
+					<span class="hero__stat-label" style="margin-top:0.25rem;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:0.05em;"><?php esc_html_e( '100% Organic', 'fardan-hikmat' ); ?></span>
 				</div>
 				<div class="hero__stat">
-					<span
-						class="hero__stat-number"
-						data-counter="50000"
-						data-counter-suffix="+"
-						data-counter-duration="2000"
-						aria-label="<?php esc_attr_e( '50,000+ happy customers', 'fardan-hikmat' ); ?>"
-					>50K+</span>
-					<span class="hero__stat-label"><?php esc_html_e( 'Happy Customers', 'fardan-hikmat' ); ?></span>
+					<span class="hero__stat-number" style="font-size:1.5rem;">⚗️</span>
+					<span class="hero__stat-label" style="margin-top:0.25rem;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:0.05em;"><?php esc_html_e( 'Lab Tested', 'fardan-hikmat' ); ?></span>
 				</div>
 				<div class="hero__stat">
-					<span
-						class="hero__stat-number"
-						data-counter="15"
-						data-counter-suffix=" yrs"
-						data-counter-duration="1500"
-						aria-label="<?php esc_attr_e( '15 years of expertise', 'fardan-hikmat' ); ?>"
-					>15 yrs</span>
-					<span class="hero__stat-label"><?php esc_html_e( 'Of Expertise', 'fardan-hikmat' ); ?></span>
+					<span class="hero__stat-number" style="font-size:1.5rem;">🚚</span>
+					<span class="hero__stat-label" style="margin-top:0.25rem;font-weight:700;color:#ffffff;text-transform:uppercase;letter-spacing:0.05em;"><?php esc_html_e( 'Fast Delivery', 'fardan-hikmat' ); ?></span>
 				</div>
 			</div>
 		</div>
@@ -122,12 +104,12 @@ $product_img = get_template_directory_uri() . '/assets/images/product-ashwagandh
 					</div>
 				</div>
 
-				<!-- Floating Badge: Rating -->
+				<!-- Floating Badge: Pure Botanicals -->
 				<div class="hero__image-badge hero__image-badge--rating">
-					<div class="hero__badge-icon" style="background:var(--aura-accent-muted);">⭐</div>
+					<div class="hero__badge-icon" style="background:var(--aura-accent-muted);">🌱</div>
 					<div class="hero__badge-text">
-						<strong><?php esc_html_e( '4.9 / 5.0', 'fardan-hikmat' ); ?></strong>
-						<span><?php esc_html_e( '50,000+ Reviews', 'fardan-hikmat' ); ?></span>
+						<strong><?php esc_html_e( 'Pure Remedies', 'fardan-hikmat' ); ?></strong>
+						<span><?php esc_html_e( 'Unani & Botanical', 'fardan-hikmat' ); ?></span>
 					</div>
 				</div>
 			</div>
