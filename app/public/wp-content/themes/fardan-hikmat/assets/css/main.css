@@ -1479,8 +1479,8 @@ del .woocommerce-Price-amount,
 .product-card__price-old,
 .pdp-price__old,
 .drawer-price-old {
-    color: #7A7569 !important;
+    color: #4A5568 !important;
     text-decoration: line-through !important;
     font-weight: 600 !important;
-    opacity: 0.75 !important;
+    opacity: 1 !important;
 }
