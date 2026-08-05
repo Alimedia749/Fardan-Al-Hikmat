@@ -1,0 +1,92 @@
+/*
+Theme Name: Fardan Al-Hikmat
+Theme URI: https://fardan-al-hikmat.com
+Author: Fardan Al-Hikmat
+Author URI: https://fardan-al-hikmat.com
+Description: Premium Herbal & Natural Wellness E-Commerce Theme with Aura Design System. Features a sophisticated botanical aesthetic, custom cursor effects, product drawer overlays, and full WooCommerce compatibility.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 8.0
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: fardan-hikmat
+Tags: e-commerce, custom-colors, custom-menu, featured-images, threaded-comments, translation-ready, woocommerce, wellness, herbal, premium
+*/
+
+/* Base Reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--aura-bg);
+    color: var(--aura-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: default;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+button, input, textarea, select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--aura-primary);
+    color: white;
+    padding: 8px 16px;
+    z-index: 100;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
