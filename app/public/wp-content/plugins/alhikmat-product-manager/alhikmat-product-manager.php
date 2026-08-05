@@ -485,12 +485,12 @@ add_action( 'wp_head', function() {
         del .woocommerce-Price-amount,
         .product-card__price-old,
         .drawer-price-old {
-            color: #dc2626 !important;
+            color: #7A7569 !important;
             text-decoration: line-through !important;
             font-size: 0.95em !important;
             margin-right: 6px !important;
-            font-weight: 700 !important;
-            opacity: 0.9 !important;
+            font-weight: 600 !important;
+            opacity: 0.75 !important;
         }
         .price-range-ins,
         .price-range-ins .woocommerce-Price-amount,

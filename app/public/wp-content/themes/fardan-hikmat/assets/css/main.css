@@ -1468,3 +1468,19 @@ body.admin-bar:not(.is-front-page) #main-content {
     transform: translateY(-2px) !important;
     box-shadow: 0 10px 30px rgba(45,80,22,0.3) !important;
 }
+
+/* ─── Regular Strikethrough Price Theme Styling ─── */
+.price del,
+.price del .woocommerce-Price-amount,
+del,
+del .woocommerce-Price-amount,
+.price-range-del,
+.price-range-del .woocommerce-Price-amount,
+.product-card__price-old,
+.pdp-price__old,
+.drawer-price-old {
+    color: #7A7569 !important;
+    text-decoration: line-through !important;
+    font-weight: 600 !important;
+    opacity: 0.75 !important;
+}
