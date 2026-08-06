@@ -235,7 +235,7 @@ add_action( 'wp_enqueue_scripts', function() {
 
             if (searchOverlay) {
                 searchOverlay.addEventListener('click', function(e) {
-                    if (e.target === searchOverlay) {
+                    if (e.target === searchOverlay || !e.target.closest('.ahpm-search-modal')) {
                         ahpmCloseSearch();
                     }
                 });

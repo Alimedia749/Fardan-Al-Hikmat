@@ -380,31 +380,31 @@ defined( 'ABSPATH' ) || exit;
 <!-- /PRODUCT DRAWER -->
 
 <!-- ═══════════════════════════════════════════
-     LIVE PRODUCT SEARCH MODAL OVERLAY (BOTANICAL THEME MATCH)
+     YOUTUBE-STYLE LIVE PRODUCT SEARCH MODAL OVERLAY
 ══════════════════════════════════════════════ -->
-<div id="ahpm-search-overlay" class="ahpm-search-overlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(8, 28, 21, 0.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); align-items:flex-start; justify-content:center; padding:70px 20px; overflow-y:auto;">
-	<div class="ahpm-search-modal" style="background:linear-gradient(145deg, #132a13 0%, #081c15 100%); border:1px solid rgba(196, 154, 26, 0.4); border-radius:20px; width:100%; max-width:720px; padding:24px 28px; box-shadow:0 25px 60px -10px rgba(0,0,0,0.8), 0 0 30px rgba(45,80,22,0.3); color:#FAFAF7; position:relative;">
+<div id="ahpm-search-overlay" class="ahpm-search-overlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0, 0, 0, 0.45); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:flex-start; justify-content:center; padding:70px 20px; overflow-y:auto;">
+	<div class="ahpm-search-modal" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; width:100%; max-width:720px; padding:24px 28px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); color:#0f172a; position:relative;">
 		
 		<!-- Search Form Header -->
-		<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; border-bottom:1px solid rgba(213,206,188,0.2); padding-bottom:16px;">
+		<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; border-bottom:1px solid #e2e8f0; padding-bottom:16px;">
 			<form role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" style="display:flex; align-items:center; gap:14px; width:100%;">
-				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C49A1A" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-				<input type="text" id="ahpm-search-input" name="s" placeholder="<?php esc_attr_e( 'Search herbal products, formulas, ingredients...', 'fardan-hikmat' ); ?>" autocomplete="off" style="width:100%; background:transparent; border:none; outline:none; color:#FAFAF7; font-size:17px; font-weight:500;" />
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5016" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+				<input type="text" id="ahpm-search-input" name="s" placeholder="<?php esc_attr_e( 'Search herbal products, formulas, ingredients...', 'fardan-hikmat' ); ?>" autocomplete="off" style="width:100%; background:transparent; border:none; outline:none; color:#0f172a; font-size:17px; font-weight:500;" />
 				<input type="hidden" name="post_type" value="product" />
-				<button type="submit" style="background:linear-gradient(135deg, #2D5016 0%, #3D6B1E 100%); color:#ffffff; font-weight:700; font-size:12px; padding:9px 18px; border-radius:10px; border:1px solid #C49A1A; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 4px 12px rgba(45,80,22,0.4);">Search</button>
+				<button type="submit" style="background:#2D5016; color:#ffffff; font-weight:700; font-size:12px; padding:9px 20px; border-radius:10px; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.8px; box-shadow:0 4px 12px rgba(45,80,22,0.25);">Search</button>
 			</form>
-			<button type="button" id="ahpm-search-close" style="background:transparent; border:none; color:#D5CEBC; font-size:24px; cursor:pointer; margin-left:14px; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='#C49A1A'" onmouseout="this.style.color='#D5CEBC'">✕</button>
+			<button type="button" id="ahpm-search-close" style="background:transparent; border:none; color:#64748b; font-size:24px; cursor:pointer; margin-left:14px; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='#0f172a'" onmouseout="this.style.color='#64748b'">✕</button>
 		</div>
 
 		<!-- Live Results Box -->
 		<div id="ahpm-search-results" style="max-height:420px; overflow-y:auto; padding-right:4px;">
-			<div style="font-size:11px; color:#C49A1A; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">🌿 Quick Suggestions</div>
+			<div style="font-size:11px; color:#2D5016; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">🌿 Quick Suggestions</div>
 			<div style="display:flex; flex-wrap:wrap; gap:8px;">
-				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Agave')" style="background:rgba(45,80,22,0.35); color:#FAFAF7; border:1px solid rgba(196,154,26,0.35); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌿 Agave</button>
-				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Ajwain')" style="background:rgba(45,80,22,0.35); color:#FAFAF7; border:1px solid rgba(196,154,26,0.35); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌱 Ajwain</button>
-				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Anise')" style="background:rgba(45,80,22,0.35); color:#FAFAF7; border:1px solid rgba(196,154,26,0.35); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌸 Anise Hyssop</button>
-				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Gooseberry')" style="background:rgba(45,80,22,0.35); color:#FAFAF7; border:1px solid rgba(196,154,26,0.35); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🍒 Gooseberry</button>
-				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Angelica')" style="background:rgba(45,80,22,0.35); color:#FAFAF7; border:1px solid rgba(196,154,26,0.35); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🪵 Angelica Root</button>
+				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Agave')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌿 Agave</button>
+				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Ajwain')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌱 Ajwain</button>
+				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Anise')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌸 Anise Hyssop</button>
+				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Gooseberry')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🍒 Gooseberry</button>
+				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Angelica')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🪵 Angelica Root</button>
 			</div>
 		</div>
 
