@@ -200,6 +200,24 @@ add_action( 'wp_enqueue_scripts', function() {
             ahpmUpdateSaleCountdowns();
 
             // 6. Live Search Modal Engine
+            window.ahpmOpenSearch = function() {
+                var searchOverlay = document.getElementById('ahpm-search-overlay');
+                var searchInput   = document.getElementById('ahpm-search-input');
+                if (searchOverlay) {
+                    searchOverlay.style.display = 'flex';
+                    if (searchInput) {
+                        setTimeout(function() { searchInput.focus(); }, 100);
+                    }
+                }
+            };
+
+            window.ahpmCloseSearch = function() {
+                var searchOverlay = document.getElementById('ahpm-search-overlay');
+                if (searchOverlay) {
+                    searchOverlay.style.display = 'none';
+                }
+            };
+
             var searchBtn    = document.getElementById('navbar-search');
             var searchOverlay= document.getElementById('ahpm-search-overlay');
             var searchClose  = document.getElementById('ahpm-search-close');
@@ -207,43 +225,33 @@ add_action( 'wp_enqueue_scripts', function() {
             var searchResults= document.getElementById('ahpm-search-results');
             var searchTimer  = null;
 
-            function ahpmOpenSearch() {
-                if (searchOverlay) {
-                    searchOverlay.style.display = 'flex';
-                    if (searchInput) {
-                        setTimeout(function() { searchInput.focus(); }, 100);
-                    }
-                }
-            }
-
-            function ahpmCloseSearch() {
-                if (searchOverlay) {
-                    searchOverlay.style.display = 'none';
-                }
-            }
-
             if (searchBtn) {
                 searchBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    ahpmOpenSearch();
+                    e.stopPropagation();
+                    window.ahpmOpenSearch();
                 });
             }
 
             if (searchClose) {
-                searchClose.addEventListener('click', ahpmCloseSearch);
+                searchClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.ahpmCloseSearch();
+                });
             }
 
             if (searchOverlay) {
                 searchOverlay.addEventListener('click', function(e) {
-                    if (e.target === searchOverlay || !e.target.closest('.ahpm-search-modal')) {
-                        ahpmCloseSearch();
+                    if (e.target === searchOverlay) {
+                        window.ahpmCloseSearch();
                     }
                 });
             }
 
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && searchOverlay && searchOverlay.style.display === 'flex') {
-                    ahpmCloseSearch();
+                if (e.key === 'Escape') {
+                    window.ahpmCloseSearch();
                 }
             });
 
