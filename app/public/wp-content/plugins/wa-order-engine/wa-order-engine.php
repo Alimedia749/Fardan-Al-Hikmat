@@ -242,9 +242,7 @@ class WA_Order_Engine {
     }
 
     public function conditional_hide_add_to_cart() {
-        if ( is_product() && get_option( 'wa_order_hide_add_to_cart' ) ) {
-            remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-        }
+        // Preserved Add to Cart button & variation dropdown options (50g, 100g)
     }
 }
 
