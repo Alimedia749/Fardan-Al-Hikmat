@@ -123,9 +123,9 @@ class WC_Product_Personalizer {
         ?>
         <div id="wcpp-customizer-container" style="margin-bottom: 25px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
             <!-- ON / OFF Toggle Header -->
-            <div id="wcpp-toggle-header" style="padding: 14px 18px; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;">
+            <div id="wcpp-toggle-header" onclick="if(typeof wcppHeaderClick==='function') wcppHeaderClick(event);" style="padding: 14px 18px; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;">
                 <label for="wcpp-enable-toggle" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; color: #1e293b; font-size: 14px; margin: 0;">
-                    <input type="checkbox" id="wcpp-enable-toggle" name="wcpp_enable_customization" value="1" style="width: 18px; height: 18px; accent-color: #2D5016; cursor: pointer;" />
+                    <input type="checkbox" id="wcpp-enable-toggle" name="wcpp_enable_customization" value="1" onclick="if(typeof wcppToggleCustomizer==='function') wcppToggleCustomizer(this.checked);" style="width: 18px; height: 18px; accent-color: #2D5016; cursor: pointer;" />
                     <span>🎨 <?php esc_html_e( 'Want to customize this product? (+Custom Label/Logo)', 'wc-product-personalizer' ); ?></span>
                 </label>
                 <span id="wcpp-toggle-badge" style="font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; background: #e2e8f0; color: #64748b; transition: all 0.2s ease;">OFF</span>
@@ -179,11 +179,50 @@ class WC_Product_Personalizer {
 
         // Pure HTML5 Canvas rendering engine for real-time text & image preview
         $inline_js = "
-            document.addEventListener('DOMContentLoaded', function() {
+            window.wcppToggleCustomizer = function(isChecked) {
                 var toggleInput = document.getElementById('wcpp-enable-toggle');
                 var customBody  = document.getElementById('wcpp-customizer-body');
                 var toggleBadge = document.getElementById('wcpp-toggle-badge');
 
+                if (toggleInput && toggleInput.checked !== isChecked) {
+                    toggleInput.checked = isChecked;
+                }
+
+                if (customBody && toggleBadge) {
+                    if (isChecked) {
+                        customBody.style.display = 'block';
+                        toggleBadge.textContent = 'ON';
+                        toggleBadge.style.background = '#2D5016';
+                        toggleBadge.style.color = '#ffffff';
+                        if (typeof window.wcppDrawCanvas === 'function') {
+                            window.wcppDrawCanvas();
+                        }
+                    } else {
+                        customBody.style.display = 'none';
+                        toggleBadge.textContent = 'OFF';
+                        toggleBadge.style.background = '#e2e8f0';
+                        toggleBadge.style.color = '#64748b';
+                        var hiddenText = document.getElementById('wcpp-hidden-text');
+                        var hiddenPreview = document.getElementById('wcpp-hidden-preview');
+                        var hiddenImage = document.getElementById('wcpp-hidden-has-image');
+                        if (hiddenText) hiddenText.value = '';
+                        if (hiddenPreview) hiddenPreview.value = '';
+                        if (hiddenImage) hiddenImage.value = '0';
+                    }
+                }
+            };
+
+            window.wcppHeaderClick = function(e) {
+                if (e.target && (e.target.id === 'wcpp-enable-toggle' || e.target.tagName === 'INPUT')) return;
+                var toggleInput = document.getElementById('wcpp-enable-toggle');
+                if (toggleInput) {
+                    var newState = !toggleInput.checked;
+                    toggleInput.checked = newState;
+                    window.wcppToggleCustomizer(newState);
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', function() {
                 var canvas = document.getElementById('wcpp-canvas');
                 if (!canvas) return;
                 var ctx = canvas.getContext('2d');
@@ -199,29 +238,7 @@ class WC_Product_Personalizer {
 
                 var uploadedImg = null;
 
-                function updateToggleState() {
-                    if (toggleInput && toggleInput.checked) {
-                        customBody.style.display = 'block';
-                        toggleBadge.textContent = 'ON';
-                        toggleBadge.style.background = '#2D5016';
-                        toggleBadge.style.color = '#ffffff';
-                        drawCanvas();
-                    } else {
-                        customBody.style.display = 'none';
-                        toggleBadge.textContent = 'OFF';
-                        toggleBadge.style.background = '#e2e8f0';
-                        toggleBadge.style.color = '#64748b';
-                        if (hiddenText) hiddenText.value = '';
-                        if (hiddenPreview) hiddenPreview.value = '';
-                        if (hiddenImage) hiddenImage.value = '0';
-                    }
-                }
-
-                if (toggleInput) {
-                    toggleInput.addEventListener('change', updateToggleState);
-                }
-
-                function drawCanvas() {
+                window.wcppDrawCanvas = function() {
                     // Clear background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -247,9 +264,9 @@ class WC_Product_Personalizer {
                     }
 
                     // Save state
-                    hiddenText.value = val;
-                    hiddenPreview.value = canvas.toDataURL('image/png');
-                }
+                    if (hiddenText) hiddenText.value = val;
+                    if (hiddenPreview) hiddenPreview.value = canvas.toDataURL('image/png');
+                };
 
                 textInput.addEventListener('input', drawCanvas);
                 colorPicker.addEventListener('input', drawCanvas);
