@@ -422,6 +422,21 @@ JS;
 }, 999 );
 
 // ═════════════════════════════════════════════════════════════════
+// 1. WOOCOMMERCE CART SESSION PERSISTENCE & CACHE PREVENTION
+// ═════════════════════════════════════════════════════════════════
+add_action( 'wp_loaded', function() {
+    if ( function_exists( 'WC' ) && WC()->session && ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+    }
+} );
+
+add_action( 'template_redirect', function() {
+    if ( function_exists( 'is_cart' ) && function_exists( 'is_checkout' ) && ( is_cart() || is_checkout() ) ) {
+        nocache_headers();
+    }
+} );
+
+// ═════════════════════════════════════════════════════════════════
 // LIVE MINI CART DRAWER & AJAX ADD TO CART ENGINE
 // ═════════════════════════════════════════════════════════════════
 add_action( 'wp_ajax_ahpm_get_cart_drawer', 'alhikmat_get_cart_drawer_ajax' );
@@ -436,6 +451,11 @@ add_action( 'wp_ajax_nopriv_ahpm_remove_cart_item', 'alhikmat_remove_cart_item_a
 function alhikmat_get_cart_drawer_ajax() {
     if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
         wp_send_json_error( array( 'message' => 'WooCommerce not active' ) );
+    }
+
+    // Ensure session cookie is initialized before returning cart drawer HTML
+    if ( WC()->session && ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
     }
 
     $cart       = WC()->cart;
@@ -486,6 +506,11 @@ function alhikmat_add_to_cart_ajax() {
         wp_send_json_error( array( 'message' => 'WooCommerce not active' ) );
     }
 
+    // Explicitly Force WooCommerce Session Cookie Initialization
+    if ( WC()->session && ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+    }
+
     $product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
     $quantity     = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
     $variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
@@ -501,11 +526,15 @@ function alhikmat_add_to_cart_ajax() {
     }
 
     // Auto-resolve variation if variable product and no variation selected
-    if ( $product->is_type( 'variable' ) && ! $variation_id ) {
-        $children = $product->get_children();
-        if ( ! empty( $children ) ) {
-            $variation_id = $children[0]; // Select default variation e.g. 50g
-            $var_obj      = wc_get_product( $variation_id );
+    if ( $product->is_type( 'variable' ) ) {
+        if ( ! $variation_id ) {
+            $children = $product->get_children();
+            if ( ! empty( $children ) ) {
+                $variation_id = $children[0]; // Select default variation e.g. 50g
+            }
+        }
+        if ( $variation_id ) {
+            $var_obj = wc_get_product( $variation_id );
             if ( $var_obj ) {
                 $variations = $var_obj->get_variation_attributes();
             }
