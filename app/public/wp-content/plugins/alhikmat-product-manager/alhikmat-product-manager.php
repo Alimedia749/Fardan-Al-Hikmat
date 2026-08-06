@@ -27,6 +27,12 @@ add_filter( 'woodmart_quick_view_enabled', '__return_false', 999 );
 add_filter( 'woodmart_show_quick_view_btn', '__return_false', 999 );
 
 add_action( 'wp_enqueue_scripts', function() {
+    if ( function_exists( 'is_product' ) && ( is_product() || is_shop() || is_front_page() || is_home() ) ) {
+        wp_enqueue_script( 'wc-add-to-cart-variation' );
+    }
+} );
+
+add_action( 'wp_enqueue_scripts', function() {
     wp_register_script( 'ahpm-frontend-fix', false );
     wp_enqueue_script( 'ahpm-frontend-fix' );
     $home_url_json = wp_json_encode( home_url( '/' ) );
@@ -36,47 +42,21 @@ add_action( 'wp_enqueue_scripts', function() {
 
             // 1. Quick View Modal Bypass & Class Stripper
             function ahpmStripQuickView() {
-                var selectors = '.quick-view, .wd-open-qv, .woodmart-open-quick-view, .open-qv, .open-quick-view, .wd-quick-view-btn, a[data-open-quick-view], [data-plugin-quickview], [data-open-drawer], .product-card__quick-view';
+                var selectors = '.quick-view, .wd-open-qv, .woodmart-open-quick-view, .open-qv, .open-quick-view, .wd-quick-view-btn, a[data-open-quick-view], [data-plugin-quickview]';
                 document.querySelectorAll(selectors).forEach(function(el) {
                     el.classList.remove('quick-view', 'wd-open-qv', 'woodmart-open-quick-view', 'open-qv', 'open-quick-view', 'wd-quick-view-btn');
                     el.removeAttribute('data-open-quick-view');
-                    el.removeAttribute('data-open-drawer');
-                    el.removeAttribute('data-id');
-                    el.removeAttribute('data-product_id');
-                    el.removeAttribute('data-action');
-                    el.removeAttribute('data-target');
                 });
             }
 
             ahpmStripQuickView();
             setTimeout(ahpmStripQuickView, 500);
-            setTimeout(ahpmStripQuickView, 1500);
-            setInterval(ahpmStripQuickView, 3000);
 
-            // 2. Global Event Interceptor - Force Direct Permalink Redirection
+            // 2. Global Event Interceptor - Preserve Add to Cart & Variation Buttons
             document.addEventListener('click', function(e) {
-                var qvTrigger = e.target.closest('.quick-view, .wd-open-qv, .woodmart-open-quick-view, .open-qv, .open-quick-view, .wd-quick-view-btn, a[data-open-quick-view], [data-open-drawer], .product-card__quick-view');
-                var productCard = e.target.closest('.product, .product-grid-item, .wd-product, .product-item, .product-card, .product-card-wrapper');
-                var link = e.target.closest('a');
-
-                if (qvTrigger || (productCard && link)) {
-                    var href = (link && link.getAttribute('href')) ? link.getAttribute('href') : null;
-                    if (!href || href === '#' || href.startsWith('javascript:')) {
-                        if (productCard) {
-                            var permalinkAnchor = productCard.querySelector('a[href*="/product/"], a.woocommerce-LoopProduct-link, .product-element-top a, .product-title a, .product-card__title a, a[href]');
-                            if (permalinkAnchor) {
-                                href = permalinkAnchor.getAttribute('href');
-                            }
-                        }
-                    }
-
-                    if (href && href !== '#' && !href.startsWith('javascript:')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        window.location.href = href;
-                        return false;
-                    }
+                var addBtn = e.target.closest('.add_to_cart_button, .single_add_to_cart_button, .add-to-cart-btn, [data-product_id], #drawer-add-to-cart');
+                if (addBtn) {
+                    return; // Allow Add to Cart & Variation Selection to proceed naturally!
                 }
             }, true);
 
