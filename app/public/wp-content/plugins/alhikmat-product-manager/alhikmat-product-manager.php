@@ -414,12 +414,49 @@ add_action( 'wp_enqueue_scripts', function() {
                             if (form) form.submit();
                         });
                 }
-            });
+            // Intercept WooCommerce native added_to_cart event for off-canvas drawer trigger
+            if (window.jQuery) {
+                jQuery(document.body).on('added_to_cart', function(event, fragments, cart_hash) {
+                    if (typeof window.ahpmOpenCartDrawer === 'function') {
+                        window.ahpmOpenCartDrawer();
+                    }
+                });
+            }
         });
 JS;
     $frontend_fix_js = str_replace( 'HOME_URL_PLACEHOLDER', $home_url_json, $frontend_fix_js );
     wp_add_inline_script( 'ahpm-frontend-fix', $frontend_fix_js );
 }, 999 );
+
+// ═════════════════════════════════════════════════════════════════
+// WOODMART HOVER ANIMATION & CHECKOUT LAYOUT ENHANCEMENTS
+// ═════════════════════════════════════════════════════════════════
+add_action( 'wp_head', function() {
+    echo '<style id="ahpm-woodmart-hover-css">
+        .product-card, .product, .wd-product {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-card:hover .product-card__img-el,
+        .product-card:hover img,
+        .product:hover img {
+            transform: scale(1.03) !important;
+            transition: transform 0.4s ease !important;
+        }
+        .product-card .add_to_cart_button,
+        .product-card .single_add_to_cart_button {
+            transition: all 0.25s ease !important;
+        }
+        .woocommerce-cart-form__contents, .shop_table.cart {
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .woocommerce-checkout #customer_details {
+            margin-bottom: 30px;
+        }
+    </style>';
+} );
 
 // ═════════════════════════════════════════════════════════════════
 // 1. WOOCOMMERCE CART SESSION PERSISTENCE & CACHE PREVENTION
