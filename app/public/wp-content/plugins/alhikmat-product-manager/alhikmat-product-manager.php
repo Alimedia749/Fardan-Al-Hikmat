@@ -394,7 +394,7 @@ function alhikmat_is_sale_active( $product_id ) {
 // Frontend Dynamic Sale Price Badge Filter (For Simple Products)
 add_filter( 'woocommerce_format_sale_price', function( $price_html, $regular_price, $sale_price ) {
     global $product;
-    if ( is_object( $product ) && ! alhikmat_is_sale_active( $product->get_id() ) ) {
+    if ( is_a( $product, 'WC_Product' ) && ! alhikmat_is_sale_active( $product->get_id() ) ) {
         return wc_price( $regular_price );
     }
 
