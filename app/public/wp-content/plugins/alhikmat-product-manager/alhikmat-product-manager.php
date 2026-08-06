@@ -312,12 +312,247 @@ add_action( 'wp_enqueue_scripts', function() {
                         ahpmPerformLiveSearch(val);
                     }, 250);
                 });
+            // Slide-Out Mini Cart Drawer Engine
+            window.ahpmOpenCartDrawer = function() {
+                var overlay = document.getElementById('ahpm-mini-cart-overlay');
+                var panel   = document.getElementById('ahpm-mini-cart-panel');
+                if (overlay && panel) {
+                    overlay.style.display = 'block';
+                    setTimeout(function() {
+                        panel.style.transform = 'translateX(0)';
+                    }, 10);
+                    window.ahpmFetchCartDrawer();
+                }
+            };
+
+            window.ahpmCloseCartDrawer = function() {
+                var overlay = document.getElementById('ahpm-mini-cart-overlay');
+                var panel   = document.getElementById('ahpm-mini-cart-panel');
+                if (overlay && panel) {
+                    panel.style.transform = 'translateX(100%)';
+                    setTimeout(function() {
+                        overlay.style.display = 'none';
+                    }, 300);
+                }
+            };
+
+            var cartOverlay = document.getElementById('ahpm-mini-cart-overlay');
+            if (cartOverlay) {
+                cartOverlay.addEventListener('click', function(e) {
+                    if (e.target === cartOverlay) {
+                        window.ahpmCloseCartDrawer();
+                    }
+                });
             }
+
+            window.ahpmFetchCartDrawer = function() {
+                var itemsContainer = document.getElementById('ahpm-mini-cart-items');
+                var subtotalEl     = document.getElementById('ahpm-cart-subtotal');
+                var badgeEl        = document.querySelector('#navbar-cart .navbar__badge');
+
+                var ajaxUrl = homeUrl + 'wp-admin/admin-ajax.php';
+                fetch(ajaxUrl + '?action=ahpm_get_cart_drawer')
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data && data.success && data.data) {
+                            if (itemsContainer) itemsContainer.innerHTML = data.data.html;
+                            if (subtotalEl) subtotalEl.innerHTML = data.data.subtotal;
+                            if (badgeEl) badgeEl.textContent = data.data.total_count;
+                        }
+                    });
+            };
+
+            window.ahpmRemoveCartItem = function(cartItemKey) {
+                var itemsContainer = document.getElementById('ahpm-mini-cart-items');
+                if (itemsContainer) itemsContainer.innerHTML = '<div style="text-align:center; padding:30px; color:#64748b;">Updating cart...</div>';
+
+                var ajaxUrl = homeUrl + 'wp-admin/admin-ajax.php';
+                var formData = new FormData();
+                formData.append('action', 'ahpm_remove_cart_item');
+                formData.append('cart_item_key', cartItemKey);
+
+                fetch(ajaxUrl, { method: 'POST', body: formData })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data && data.success && data.data) {
+                            var subtotalEl = document.getElementById('ahpm-cart-subtotal');
+                            var badgeEl    = document.querySelector('#navbar-cart .navbar__badge');
+                            if (itemsContainer) itemsContainer.innerHTML = data.data.html;
+                            if (subtotalEl) subtotalEl.innerHTML = data.data.subtotal;
+                            if (badgeEl) badgeEl.textContent = data.data.total_count;
+                        }
+                    });
+            };
+
+            // Initial badge sync on load
+            setTimeout(function() {
+                if (typeof window.ahpmFetchCartDrawer === 'function') {
+                    window.ahpmFetchCartDrawer();
+                }
+            }, 500);
+
+            // Intercept Single Product Add to Cart Form Submissions & Add Buttons
+            document.addEventListener('click', function(e) {
+                var addBtn = e.target.closest('.single_add_to_cart_button, .add_to_cart_button, #drawer-add-to-cart');
+                if (!addBtn) return;
+
+                var form = addBtn.closest('form.cart') || addBtn.closest('form');
+                var productIdInput = form ? form.querySelector('[name="add-to-cart"], [name="product_id"]') : null;
+                var productId = productIdInput ? productIdInput.value : addBtn.getAttribute('data-product_id');
+                var qtyInput = form ? form.querySelector('[name="quantity"]') : null;
+                var quantity = qtyInput ? qtyInput.value : 1;
+                var varInput = form ? form.querySelector('[name="variation_id"]') : null;
+                var variationId = varInput ? varInput.value : 0;
+
+                if (productId) {
+                    e.preventDefault();
+                    addBtn.disabled = true;
+                    var origText = addBtn.innerHTML;
+                    addBtn.innerHTML = 'Adding...';
+
+                    var formData = new FormData();
+                    formData.append('action', 'ahpm_add_to_cart');
+                    formData.append('product_id', productId);
+                    formData.append('quantity', quantity);
+                    formData.append('variation_id', variationId);
+
+                    var ajaxUrl = homeUrl + 'wp-admin/admin-ajax.php';
+                    fetch(ajaxUrl, { method: 'POST', body: formData })
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            addBtn.disabled = false;
+                            addBtn.innerHTML = origText;
+                            if (data && data.success) {
+                                window.ahpmOpenCartDrawer();
+                            } else {
+                                if (form) form.submit();
+                            }
+                        })
+                        .catch(function() {
+                            addBtn.disabled = false;
+                            addBtn.innerHTML = origText;
+                            if (form) form.submit();
+                        });
+                }
+            });
         });
 JS;
     $frontend_fix_js = str_replace( 'HOME_URL_PLACEHOLDER', $home_url_json, $frontend_fix_js );
     wp_add_inline_script( 'ahpm-frontend-fix', $frontend_fix_js );
 }, 999 );
+
+// ═════════════════════════════════════════════════════════════════
+// LIVE MINI CART DRAWER & AJAX ADD TO CART ENGINE
+// ═════════════════════════════════════════════════════════════════
+add_action( 'wp_ajax_ahpm_get_cart_drawer', 'alhikmat_get_cart_drawer_ajax' );
+add_action( 'wp_ajax_nopriv_ahpm_get_cart_drawer', 'alhikmat_get_cart_drawer_ajax' );
+
+add_action( 'wp_ajax_ahpm_add_to_cart', 'alhikmat_add_to_cart_ajax' );
+add_action( 'wp_ajax_nopriv_ahpm_add_to_cart', 'alhikmat_add_to_cart_ajax' );
+
+add_action( 'wp_ajax_ahpm_remove_cart_item', 'alhikmat_remove_cart_item_ajax' );
+add_action( 'wp_ajax_nopriv_ahpm_remove_cart_item', 'alhikmat_remove_cart_item_ajax' );
+
+function alhikmat_get_cart_drawer_ajax() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+        wp_send_json_error( array( 'message' => 'WooCommerce not active' ) );
+    }
+
+    $cart       = WC()->cart;
+    $items      = $cart->get_cart();
+    $total_cnt  = $cart->get_cart_contents_count();
+    $subtotal   = $cart->get_cart_subtotal();
+    $items_html = '';
+
+    if ( empty( $items ) ) {
+        $items_html = '<div style="text-align:center; padding:50px 20px; color:#64748b;">' .
+            '<div style="font-size:3.5rem; margin-bottom:12px;">🛒</div>' .
+            '<h4 style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">Your cart is empty</h4>' .
+            '<p style="font-size:13px; margin-bottom:20px;">Explore our organic herbal remedies and add your favorites to cart.</p>' .
+            '<a href="' . esc_url( home_url( '/#shop' ) ) . '" class="btn btn-primary" onclick="ahpmCloseCartDrawer();" style="padding:10px 20px; border-radius:8px; background:#2D5016; color:#fff; text-decoration:none; font-size:13px; font-weight:700; display:inline-block;">Shop All Botanicals</a>' .
+            '</div>';
+    } else {
+        foreach ( $items as $cart_item_key => $cart_item ) {
+            $_product   = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+            $product_id = apply_filters( 'woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key );
+
+            if ( $_product && $_product->exists() && $cart_item['quantity'] > 0 ) {
+                $product_name  = $_product->get_name();
+                $thumbnail     = $_product->get_image( array( 60, 60 ), array( 'style' => 'width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #e2e8f0;' ) );
+                $product_price = WC()->cart->get_product_price( $_product );
+                $quantity      = $cart_item['quantity'];
+
+                $items_html .= '<div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid #e2e8f0; align-items:center;">' .
+                    '<div>' . $thumbnail . '</div>' .
+                    '<div style="flex:1; min-width:0;">' .
+                    '<div style="font-size:14px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' . esc_html( $product_name ) . '</div>' .
+                    '<div style="font-size:12px; color:#64748b; margin-top:2px;">Qty: <strong>' . esc_html( $quantity ) . '</strong> × ' . $product_price . '</div>' .
+                    '</div>' .
+                    '<button type="button" onclick="ahpmRemoveCartItem(\'' . esc_attr( $cart_item_key ) . '\')" style="background:transparent; border:none; color:#ef4444; font-size:18px; cursor:pointer; padding:4px 8px; line-height:1;" title="Remove item">🗑️</button>' .
+                    '</div>';
+            }
+        }
+    }
+
+    wp_send_json_success( array(
+        'html'        => $items_html,
+        'subtotal'    => $subtotal,
+        'total_count' => $total_cnt,
+    ) );
+}
+
+function alhikmat_add_to_cart_ajax() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+        wp_send_json_error( array( 'message' => 'WooCommerce not active' ) );
+    }
+
+    $product_id   = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+    $quantity     = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
+    $variation_id = isset( $_POST['variation_id'] ) ? absint( $_POST['variation_id'] ) : 0;
+    $variations   = array();
+
+    if ( ! $product_id ) {
+        wp_send_json_error( array( 'message' => 'Invalid product' ) );
+    }
+
+    $product = wc_get_product( $product_id );
+    if ( ! $product ) {
+        wp_send_json_error( array( 'message' => 'Product not found' ) );
+    }
+
+    // Auto-resolve variation if variable product and no variation selected
+    if ( $product->is_type( 'variable' ) && ! $variation_id ) {
+        $children = $product->get_children();
+        if ( ! empty( $children ) ) {
+            $variation_id = $children[0]; // Select default variation e.g. 50g
+            $var_obj      = wc_get_product( $variation_id );
+            if ( $var_obj ) {
+                $variations = $var_obj->get_variation_attributes();
+            }
+        }
+    }
+
+    $added = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variations );
+
+    if ( $added ) {
+        alhikmat_get_cart_drawer_ajax();
+    } else {
+        wp_send_json_error( array( 'message' => 'Failed to add item to cart' ) );
+    }
+}
+
+function alhikmat_remove_cart_item_ajax() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+        wp_send_json_error( array( 'message' => 'WooCommerce not active' ) );
+    }
+
+    $cart_item_key = isset( $_POST['cart_item_key'] ) ? sanitize_text_field( $_POST['cart_item_key'] ) : '';
+    if ( $cart_item_key ) {
+        WC()->cart->remove_cart_item( $cart_item_key );
+    }
+
+    alhikmat_get_cart_drawer_ajax();
+}
 
 // Live AJAX Product Search Handler
 add_action( 'wp_ajax_ahpm_live_search', 'alhikmat_live_product_search' );

@@ -203,7 +203,8 @@ defined( 'ABSPATH' ) || exit;
 				id="navbar-cart"
 				class="navbar__action-btn"
 				type="button"
-				aria-label="<?php esc_attr_e( 'Shopping cart, 0 items', 'fardan-hikmat' ); ?>"
+				onclick="if(typeof ahpmOpenCartDrawer==='function') ahpmOpenCartDrawer();"
+				aria-label="<?php esc_attr_e( 'Shopping cart', 'fardan-hikmat' ); ?>"
 			>
 				<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
 				<span class="navbar__badge" aria-live="polite" aria-atomic="true">0</span>
@@ -406,6 +407,48 @@ defined( 'ABSPATH' ) || exit;
 				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Anise')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🌸 Anise Hyssop</button>
 				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Gooseberry')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🍒 Gooseberry</button>
 				<button type="button" class="ahpm-search-tag" onclick="ahpmFillSearch('Angelica')" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:600; transition:all 0.2s ease;">🪵 Angelica Root</button>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE-OUT MINI CART DRAWER
+══════════════════════════════════════════════ -->
+<div id="ahpm-mini-cart-overlay" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);">
+	<div id="ahpm-mini-cart-panel" style="position:fixed; top:0; right:0; bottom:0; width:100%; max-width:420px; background:#ffffff; box-shadow:-10px 0 40px rgba(0,0,0,0.25); display:flex; flex-direction:column; z-index:1000000; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+		
+		<!-- Drawer Header -->
+		<div style="padding:20px 24px; background:#1e293b; color:#ffffff; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #334155;">
+			<div style="display:flex; align-items:center; gap:10px;">
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+				<h3 style="margin:0; font-size:17px; font-weight:700; color:#ffffff; font-family:sans-serif;"><?php esc_html_e( 'Your Shopping Cart', 'fardan-hikmat' ); ?></h3>
+			</div>
+			<button type="button" id="ahpm-cart-close" onclick="if(typeof ahpmCloseCartDrawer==='function') ahpmCloseCartDrawer();" style="background:transparent; border:none; color:#94a3b8; font-size:24px; cursor:pointer; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#94a3b8'">✕</button>
+		</div>
+
+		<!-- Cart Items Body -->
+		<div id="ahpm-mini-cart-items" style="flex:1; overflow-y:auto; padding:20px;">
+			<div style="text-align:center; padding:40px 20px; color:#64748b;">
+				<div style="font-size:3rem; margin-bottom:12px;">🛒</div>
+				<p style="font-weight:600; font-size:15px; margin:0;"><?php esc_html_e( 'Loading your cart...', 'fardan-hikmat' ); ?></p>
+			</div>
+		</div>
+
+		<!-- Drawer Footer & Checkout Buttons -->
+		<div id="ahpm-mini-cart-footer" style="padding:20px 24px; background:#f8fafc; border-top:1px solid #e2e8f0;">
+			<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+				<span style="font-weight:700; color:#475569; font-size:14px; text-transform:uppercase; letter-spacing:0.5px;"><?php esc_html_e( 'Subtotal:', 'fardan-hikmat' ); ?></span>
+				<span id="ahpm-cart-subtotal" style="font-weight:800; color:#2D5016; font-size:20px;">$0.00</span>
+			</div>
+			<div style="display:flex; flex-direction:column; gap:10px;">
+				<a href="<?php echo esc_url( wc_get_checkout_url() ); ?>" class="btn btn-primary" style="text-align:center; padding:14px; font-weight:800; font-size:14px; border-radius:10px; background:#2D5016; color:#ffffff; text-decoration:none; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 14px rgba(45,80,22,0.3); display:block;">
+					<?php esc_html_e( 'Proceed to Checkout ➔', 'fardan-hikmat' ); ?>
+				</a>
+				<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" style="text-align:center; padding:10px; font-weight:700; font-size:13px; color:#475569; text-decoration:none; display:block;">
+					<?php esc_html_e( 'View Cart Page', 'fardan-hikmat' ); ?>
+				</a>
 			</div>
 		</div>
 
