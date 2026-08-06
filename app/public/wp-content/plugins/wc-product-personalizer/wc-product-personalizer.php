@@ -123,9 +123,9 @@ class WC_Product_Personalizer {
         ?>
         <div id="wcpp-customizer-container" style="margin-bottom: 25px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
             <!-- ON / OFF Toggle Header -->
-            <div id="wcpp-toggle-header" onclick="if(typeof wcppHeaderClick==='function') wcppHeaderClick(event);" style="padding: 14px 18px; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;">
-                <label for="wcpp-enable-toggle" style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; color: #1e293b; font-size: 14px; margin: 0;">
-                    <input type="checkbox" id="wcpp-enable-toggle" name="wcpp_enable_customization" value="1" onclick="if(typeof wcppToggleCustomizer==='function') wcppToggleCustomizer(this.checked);" style="width: 18px; height: 18px; accent-color: #2D5016; cursor: pointer;" />
+            <div id="wcpp-toggle-header" style="padding: 14px 18px; background: #f8fafc; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; color: #1e293b; font-size: 14px; margin: 0;">
+                    <input type="checkbox" id="wcpp-enable-toggle" name="wcpp_enable_customization" value="1" style="width: 18px; height: 18px; accent-color: #2D5016; cursor: pointer;" />
                     <span>🎨 <?php esc_html_e( 'Want to customize this product? (+Custom Label/Logo)', 'wc-product-personalizer' ); ?></span>
                 </label>
                 <span id="wcpp-toggle-badge" style="font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; background: #e2e8f0; color: #64748b; transition: all 0.2s ease;">OFF</span>
@@ -166,6 +166,54 @@ class WC_Product_Personalizer {
                 <input type="hidden" name="wcpp_has_image" id="wcpp-hidden-has-image" value="0" />
             </div>
         </div>
+
+        <script>
+        (function() {
+            function setupCustomizerToggle() {
+                var toggleInput = document.getElementById('wcpp-enable-toggle');
+                var toggleHeader= document.getElementById('wcpp-toggle-header');
+                var customBody  = document.getElementById('wcpp-customizer-body');
+                var toggleBadge = document.getElementById('wcpp-toggle-badge');
+
+                if (!toggleInput || !customBody || !toggleBadge) return;
+
+                function updateState() {
+                    if (toggleInput.checked) {
+                        customBody.style.display = 'block';
+                        toggleBadge.textContent = 'ON';
+                        toggleBadge.style.background = '#2D5016';
+                        toggleBadge.style.color = '#ffffff';
+                        if (typeof window.wcppDrawCanvas === 'function') {
+                            window.wcppDrawCanvas();
+                        }
+                    } else {
+                        customBody.style.display = 'none';
+                        toggleBadge.textContent = 'OFF';
+                        toggleBadge.style.background = '#e2e8f0';
+                        toggleBadge.style.color = '#64748b';
+                    }
+                }
+
+                toggleInput.addEventListener('change', updateState);
+
+                if (toggleHeader) {
+                    toggleHeader.addEventListener('click', function(e) {
+                        if (e.target && (e.target.id === 'wcpp-enable-toggle' || e.target.tagName === 'INPUT')) {
+                            return;
+                        }
+                        toggleInput.checked = !toggleInput.checked;
+                        updateState();
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupCustomizerToggle);
+            } else {
+                setupCustomizerToggle();
+            }
+        })();
+        </script>
         <?php
     }
 
@@ -179,49 +227,6 @@ class WC_Product_Personalizer {
 
         // Pure HTML5 Canvas rendering engine for real-time text & image preview
         $inline_js = "
-            window.wcppToggleCustomizer = function(isChecked) {
-                var toggleInput = document.getElementById('wcpp-enable-toggle');
-                var customBody  = document.getElementById('wcpp-customizer-body');
-                var toggleBadge = document.getElementById('wcpp-toggle-badge');
-
-                if (toggleInput && toggleInput.checked !== isChecked) {
-                    toggleInput.checked = isChecked;
-                }
-
-                if (customBody && toggleBadge) {
-                    if (isChecked) {
-                        customBody.style.display = 'block';
-                        toggleBadge.textContent = 'ON';
-                        toggleBadge.style.background = '#2D5016';
-                        toggleBadge.style.color = '#ffffff';
-                        if (typeof window.wcppDrawCanvas === 'function') {
-                            window.wcppDrawCanvas();
-                        }
-                    } else {
-                        customBody.style.display = 'none';
-                        toggleBadge.textContent = 'OFF';
-                        toggleBadge.style.background = '#e2e8f0';
-                        toggleBadge.style.color = '#64748b';
-                        var hiddenText = document.getElementById('wcpp-hidden-text');
-                        var hiddenPreview = document.getElementById('wcpp-hidden-preview');
-                        var hiddenImage = document.getElementById('wcpp-hidden-has-image');
-                        if (hiddenText) hiddenText.value = '';
-                        if (hiddenPreview) hiddenPreview.value = '';
-                        if (hiddenImage) hiddenImage.value = '0';
-                    }
-                }
-            };
-
-            window.wcppHeaderClick = function(e) {
-                if (e.target && (e.target.id === 'wcpp-enable-toggle' || e.target.tagName === 'INPUT')) return;
-                var toggleInput = document.getElementById('wcpp-enable-toggle');
-                if (toggleInput) {
-                    var newState = !toggleInput.checked;
-                    toggleInput.checked = newState;
-                    window.wcppToggleCustomizer(newState);
-                }
-            };
-
             document.addEventListener('DOMContentLoaded', function() {
                 var canvas = document.getElementById('wcpp-canvas');
                 if (!canvas) return;
@@ -239,15 +244,30 @@ class WC_Product_Personalizer {
                 var uploadedImg = null;
 
                 window.wcppDrawCanvas = function() {
-                    // Clear background
+                    if (!canvas || !ctx) return;
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Draw Mockup Guide Box
                     ctx.strokeStyle = '#e0e0e0';
                     ctx.setLineDash([4, 4]);
                     ctx.strokeRect(20, 20, 220, 220);
                     ctx.setLineDash([]);
+
+                    if (uploadedImg) {
+                        ctx.drawImage(uploadedImg, 50, 50, 160, 160);
+                    }
+
+                    var val = textInput ? textInput.value : '';
+                    if (val) {
+                        ctx.font = 'bold 20px sans-serif';
+                        ctx.fillStyle = colorPicker ? colorPicker.value : '#000000';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(val, canvas.width / 2, 220);
+                    }
+
+                    if (hiddenText) hiddenText.value = val;
+                    if (hiddenPreview) hiddenPreview.value = canvas.toDataURL('image/png');
+                };
 
                     // Draw Uploaded Image if available
                     if (uploadedImg) {
